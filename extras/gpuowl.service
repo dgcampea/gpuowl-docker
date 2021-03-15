@@ -1,0 +1,37 @@
+# check podman-generate-systemd manual for more info
+
+[Unit]
+Description=gpuowl Mersenne Primality Test software (Container)
+
+[Service]
+Restart=on-failure
+
+Environment=PODMAN_SYSTEMD_UNIT=%n
+WorkingDirectory=%h/gpuowl_container/instance-%i
+
+ExecStartPre=/bin/rm -rf memlock-0
+ExecStartPre=/bin/rm -f %t/container-gpuowl-%i.pid %t/container-gpuowl-%i.ctr-id
+
+ExecStart=/usr/bin/podman run --rm -d --read-only \
+        --device=/dev/kfd --device=/dev/dri \
+        --network=none --cap-drop=all \
+        --security-opt label=type:gpuowl_container.process \
+        -v %h/gpuowl_container/instance-%i:/in:noexec,nodev,nosuid,Z \
+        --conmon-pidfile %t/container-gpuowl-%i.pid \
+        --cidfile %t/container-gpuowl-%i.ctr-id \
+        --cgroups=no-conmon \
+        gpuowl:latest
+
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/container-gpuowl-%i.ctr-id -t 600
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/container-gpuowl-%i.ctr-id
+
+PIDFile=%t/container-gpuowl-%i.pid
+KillMode=none
+Type=forking
+PrivateTmp=yes
+
+# https://github.com/containers/podman/issues/5423
+# DO NOT REMOVE default.target
+
+[Install]
+WantedBy=multi-user.target default.target
