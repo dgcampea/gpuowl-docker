@@ -42,7 +42,7 @@ ARG COMMIT
 WORKDIR /build
 RUN git init \
         && git remote add origin https://github.com/preda/gpuowl.git \
-        && git fetch origin ${COMMIT} \
+        && git fetch --tags origin ${COMMIT} \
         && git reset --hard FETCH_HEAD \
         && make
 
