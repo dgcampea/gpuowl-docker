@@ -18,6 +18,7 @@ You need to add the user that will run `gpuowl` to the `video` group.
 This can be done with:
 ```
 sudo usermod -a -G video <your user>
+echo 'SUBSYSTEM=="kfd", KERNEL=="kfd", TAG+="uaccess", GROUP="video"' | sudo tee /etc/udev/rules.d/70-kfd.rules
 ```
 
 Afterwards, logout and login for the changes to take effect.
@@ -87,7 +88,7 @@ In this mode, `gpuowl` will read and save its data to `~/gpuowl_container/instan
 Running more than one instance can be done by changing the argument after `gpuowl@` (ex: `gpuowl@nano.service`)
 and creating a directory `instance-nano` with *config.txt* under `~/gpuowl_container/`.
 
-#### automatic downclocking support (requires `rocm-smi` on system):
+#### Automatic downclocking support (requires `rocm-smi` on system):
 
 Grant your user sudo powers for `rocm-smi` by adding this to your */etc/sudoers* file:
 ```
