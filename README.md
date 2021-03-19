@@ -13,6 +13,7 @@ Dockerfile and utilities for using and deploying gpuowl.
       - [Daemon mode](#daemon-mode)
   - [Building locally](#building-locally)
       - [Makefile variables](#makefile-variables)
+  - [License](#license)
 
 ## Installing
 
@@ -120,3 +121,8 @@ Set the image tag and checkout at the commit specified.
 If the latest commit id at HEAD isn’t retrievable, defaults to `HEAD`.  
 Can be used to checkout specific commit ids or branches.  
 Upstream repo: <https://github.com/preda/gpuowl>
+
+## License
+
+Unless stated otherwise, all content from this repo is placed under *CC0
+1.0 Universal* when applicable.

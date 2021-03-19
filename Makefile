@@ -15,7 +15,8 @@ endif
 
 image:
 	podman build -f Dockerfile --target application --tag $(IMAGE_NAME):$(COMMIT) \
-	  --build-arg COMMIT=$(COMMIT)
+	  --build-arg COMMIT=$(COMMIT) \
+	  --annotation=org.opencontainers.image.licenses=GPL-3.0
 ifeq ($(LATEST),yes)
 	podman tag $(IMAGE_NAME):$(COMMIT) $(IMAGE_NAME):latest
 endif
