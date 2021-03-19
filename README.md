@@ -12,6 +12,7 @@ Dockerfile and utilities for using and deploying gpuowl.
         usage)](#drop-in-replacement-mode-console-usage)
       - [Daemon mode](#daemon-mode)
   - [Building locally](#building-locally)
+      - [Makefile recipes](#makefile-recipes)
       - [Makefile variables](#makefile-variables)
   - [License](#license)
 
@@ -63,7 +64,7 @@ Example:
     podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
         -v "$HOME/gpuowl_container":/in gpuowl:latest -h
 
-See *gpuowl\_wrapper.sh* and *Dockerfile* for more details.
+See *gpuowl-wrapper.sh* and *Dockerfile* for more details.
 
 ### Drop-in replacement mode (console usage)
 
@@ -106,9 +107,21 @@ Afterwards, create an override config for the service unit with:
 
 Invoke `make` to build Dockerfile.  
 Variables can be overridden with `make VAR=value VAR2=value ...`.  
-By default, the built image is tagged as *gpuowl:COMMIT\_ID* and
-*gpuowl:latest*.  
-If`COMMIT` is specified, the image will not be tagged with *latest*.
+By default, the built image is tagged as *gpuowl:COMMIT\_ID*,
+*gpuowl:gpuowl\_version* and *gpuowl:latest*.  
+If `COMMIT` is specified, the image will not be tagged with *latest*.
+
+### Makefile recipes
+
+#### image / image-nocache
+
+*default target*
+
+Build gpuowl container image.
+
+#### install
+
+Install gpuowl-wrapper.sh to `~/.local/bin`.
 
 ### Makefile variables
 

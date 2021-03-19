@@ -55,6 +55,7 @@ RUN apt-get update \
         && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /build/gpuowl /app/
+COPY --from=builder /build/version.inc /app/version
 RUN mkdir /in
 
 WORKDIR /in
