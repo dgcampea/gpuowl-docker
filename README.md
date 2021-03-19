@@ -4,8 +4,7 @@ Dockerfile and utilities for using and deploying gpuowl.
 
 # Table of Contents
   - [Installing](#installing)
-      - [1. Pulling the image](#pulling-the-image)
-      - [2. ROCm setup](#rocm-setup)
+      - [Pulling the image](#pulling-the-image)
       - [Note: SELinux enabled systems](#note-selinux-enabled-systems)
   - [Usage](#usage)
       - [Podman/Docker parameters](#podmandocker-parameters)
@@ -17,20 +16,11 @@ Dockerfile and utilities for using and deploying gpuowl.
 
 ## Installing
 
-### 1\. Pulling the image
+### Pulling the image
 
 Pull with:
 
     podman pull ghcr.io/dgcampea/gpuowl:latest
-
-### 2\. ROCm setup
-
-You need to add the user that will run `gpuowl` to the `video` group.
-This can be done with:
-
-    sudo usermod -a -G video <your user>
-
-Afterwards, logout and login for the changes to take effect.
 
 ### Note: SELinux enabled systems
 
@@ -99,7 +89,7 @@ Running more than one instance can be done by changing the argument
 after `gpuowl@` (ex: `gpuowl@nano.service`) and creating a directory
 `instance-nano` with *config.txt* under `~/gpuowl_container/`.
 
-#### automatic downclocking support (requires `rocm-smi` on system):
+#### Automatic downclocking support (requires `rocm-smi` on system):
 
 Grant your user sudo powers for `rocm-smi` by adding this to your
 */etc/sudoers* file:

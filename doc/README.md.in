@@ -6,22 +6,12 @@ description: |
 
 ## Installing
 
-### 1. Pulling the image
+### Pulling the image
 
 Pull with:
 ```
 podman pull ghcr.io/dgcampea/gpuowl:latest
 ```
-
-### 2. ROCm setup
-You need to add the user that will run `gpuowl` to the `video` group.
-This can be done with:
-```
-sudo usermod -a -G video <your user>
-echo 'SUBSYSTEM=="kfd", KERNEL=="kfd", TAG+="uaccess", GROUP="video"' | sudo tee /etc/udev/rules.d/70-kfd.rules
-```
-
-Afterwards, logout and login for the changes to take effect.
 
 ### Note: SELinux enabled systems
 For SELinux enabled systems, `udica` package is recommended.  
