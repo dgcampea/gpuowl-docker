@@ -56,9 +56,8 @@ RUN apt-get update \
 
 COPY --from=builder /build/gpuowl /app/
 COPY --from=builder /build/version.inc /app/version
-RUN mkdir /in
 
-WORKDIR /in
 VOLUME /in
+WORKDIR /in
 STOPSIGNAL SIGINT
 ENTRYPOINT ["/usr/bin/stdbuf", "-oL", "/app/gpuowl"]
