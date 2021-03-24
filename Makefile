@@ -29,6 +29,7 @@ push:
 ifeq ($(LATEST),1)
 	@echo $(CR_PAT) | podman login ghcr.io -u $(GH_USER) --password-stdin
 	podman push $(IMAGE_NAME):latest ghcr.io/$(GH_USER)/$(GH_PKG):latest
+	sleep 5
 	podman push $(IMAGE_NAME):latest ghcr.io/$(GH_USER)/$(GH_PKG):$(shell podman inspect --type image gpuowl:latest  | jq '.[0].Annotations."org.opencontainers.image.version"')
 	podman logout ghcr.io
 endif
