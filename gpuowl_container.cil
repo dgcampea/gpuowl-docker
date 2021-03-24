@@ -1,0 +1,9 @@
+(block gpuowl_container
+    (blockinherit container)
+    (allow process var_lib_t ( dir ( add_name create getattr ioctl lock open read remove_name rmdir search setattr write )))
+    (allow process var_lib_t ( file ( append create getattr ioctl lock map open read rename setattr unlink write )))
+    (allow process var_lib_t ( sock_file ( append getattr open read write )))
+    (allow process hsa_device_t ( chr_file ( ioctl map open read write )))
+    (allow process dri_device_t ( chr_file ( map open read write )))
+    (allow process random_device_t ( chr_file ( write )))
+)
