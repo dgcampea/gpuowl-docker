@@ -22,9 +22,25 @@ gpuowl.
 
 ### Pulling the image
 
-Pull with:
+Pull the latest available image with:
 
-    $ podman pull ghcr.io/dgcampea/gpuowl:latest
+``` sh
+$ podman pull ghcr.io/dgcampea/gpuowl:latest
+```
+
+To pull a specific gpuowl image, list available tags with
+`podman-search`:
+
+``` sh
+$ podman search --list-tags ghcr.io/dgcampea/gpuowl
+NAME                     TAG
+ghcr.io/dgcampea/gpuowl  v7.2-69-g23c14a1
+ghcr.io/dgcampea/gpuowl  v7.2-70-g212618e
+ghcr.io/dgcampea/gpuowl  latest
+
+# pull v7.2-70-g212618e
+$ podman pull ghcr.io/dgcampea/gpuowl:v7.2-70-g212618e
+```
 
 ### Note: SELinux enabled systems
 
