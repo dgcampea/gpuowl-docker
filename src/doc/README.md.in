@@ -26,19 +26,23 @@ $ podman pull ghcr.io/dgcampea/gpuowl:v7.2-70-g212618e
 ```
 
 ### Note: SELinux enabled systems
-For SELinux enabled systems, `udica` package is recommended.  
-If the package is not available for your distribution, you can download
+For SELinux enabled systems, two modules are required:
+
+  - base_container.cil (provided by `udica`)
+  - gpuowl.cil (located at `extras/gpuowl.cil`)
+
+If `udica` package is not available for your distribution, you can download
 the required file from: <https://github.com/containers/udica/blob/master/udica/templates/base_container.cil>
 
 #### With `udica`:
 ```sh
-$ sudo semodule -i gpuowl_container.cil /usr/share/udica/templates/base_container.cil
+$ sudo semodule -i extras/gpuowl_container.cil /usr/share/udica/templates/base_container.cil
 ```
 
 #### Without `udica`
 ```sh
 $ curl -O https://raw.githubusercontent.com/containers/udica/master/udica/templates/base_container.cil
-$ sudo semodule -i gpuowl_container.cil base_container.cil
+$ sudo semodule -i extras/gpuowl_container.cil base_container.cil
 ```
 
 ## Usage
@@ -65,9 +69,6 @@ $ podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
     -v "$HOME/gpuowl_container":/in gpuowl:latest -h
 ```
 
-
-See *gpuowl-wrapper.sh* for more details.
-
 ### Drop-in replacement mode (console usage)
 
 `gpuowl-wrapper.sh` attempts to be a near drop-in replacement for gpuowl.  
@@ -82,7 +83,7 @@ Prepare your system with (replace *\<user\>* with the user that will run `gpuowl
 $ sudo setsebool -P container_manage_cgroup on      # for SELinux systems
 $ sudo loginctl enable-linger <user>
 $ mkdir "$HOME/gpuowl_container"
-$ cp extras/gpuowl.service ~/.config/systemd/user/gpuowl.service
+$ cp extras/daemon/gpuowl.service ~/.config/systemd/user/gpuowl.service
 $ systemctl enable --user gpuowl@default.service
 ```
 
@@ -99,7 +100,7 @@ Grant your user sudo powers for `rocm-smi` by adding this to your */etc/sudoers*
 
 Afterwards, create an override config for the service unit with:
 ```sh
-$ install -Dm644 -t ~/.config/systemd/user/gpuowl@.service.d extras/override.conf
+$ install -Dm644 -t ~/.config/systemd/user/gpuowl@.service.d extras/daemon/override.conf
 $ systemctl daemon-reload --user
 ```
 
