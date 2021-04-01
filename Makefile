@@ -13,17 +13,18 @@ ifeq ($(LATEST),1)
 	BUILD_ARG += -l
 endif
 
+SRCDIR = src
+SRCDOCDIR = $(SRCDIR)/doc
+
 image:
-	buildah unshare ./build-image.sh $(BUILD_ARG)
+	buildah unshare $(SRCDIR)/build-image.sh $(BUILD_ARG)
 
 install:
-ifneq ($(EXTRA_PROGRAMS),)
-	install -m755 -t "$(HOME)"/.local/bin $(EXTRA_PROGRAMS)
-endif
+	install -m755 -t "$(HOME)"/.local/bin extras/$(EXTRA_PROGRAMS)
 
 doc:
-	pandoc --toc -V toc-title:"Table of Contents" --template doc/template.markdown -f markdown+yaml_metadata_block -t gfm -o README.md doc/README.md.in
-	pandoc --toc -V toc-title:"Table of Contents" --template doc/template.markdown -f markdown+yaml_metadata_block -t gfm -o CONTRIB.md doc/CONTRIB.md.in
+	pandoc --toc -V toc-title:"Table of Contents" --template $(SRCDOCDIR)/template.markdown -f markdown+yaml_metadata_block -t gfm -o README.md $(SRCDOCDIR)/README.md.in
+	pandoc --toc -V toc-title:"Table of Contents" --template $(SRCDOCDIR)/template.markdown -f markdown+yaml_metadata_block -t gfm -o CONTRIB.md $(SRCDOCDIR)/CONTRIB.md.in
 
 push:
 ifeq ($(LATEST),1)
