@@ -10,7 +10,8 @@ IMAGE_REPOSITORY="${IMAGE_NAME}"
 CONTAINER_ID_DIR="$(mktemp -d -t container-${IMAGE_NAME}-XXXXX)"
 CONTAINER_ID_FILE="${CONTAINER_ID_DIR}/${IMAGE_NAME}.ctr-id"
 
-CONTAINER_ENGINE="podman"
+CONTAINER_ENGINE=$([ -x "$(command -v podman)" ] && echo podman || echo docker)
+
 
 if [ "$(getenforce)" = "Enforcing" ]  ; then
         EXTRA_CONTAINER_FLAGS='--security-opt label=type:gpuowl_container.process'
