@@ -1,6 +1,7 @@
-# gpuowl Dockerfile
+# gpuowl container image
 
-Dockerfile and utilities for using and deploying gpuowl.
+Container image build script and utilities for using and deploying
+gpuowl.
 
 # Table of Contents
   - [Installing](#installing)
@@ -12,6 +13,7 @@ Dockerfile and utilities for using and deploying gpuowl.
         usage)](#drop-in-replacement-mode-console-usage)
       - [Daemon mode](#daemon-mode)
   - [Building locally](#building-locally)
+      - [Dependencies](#dependencies)
       - [Makefile recipes](#makefile-recipes)
       - [Makefile variables](#makefile-variables)
   - [License](#license)
@@ -20,25 +22,49 @@ Dockerfile and utilities for using and deploying gpuowl.
 
 ### Pulling the image
 
-Pull with:
+Pull the latest available image with:
 
-    podman pull ghcr.io/dgcampea/gpuowl:latest
+``` sh
+$ podman pull ghcr.io/dgcampea/gpuowl:latest
+```
+
+To pull a specific gpuowl image, list available tags with
+`podman-search`:
+
+``` sh
+$ podman search --list-tags ghcr.io/dgcampea/gpuowl
+NAME                     TAG
+ghcr.io/dgcampea/gpuowl  v7.2-69-g23c14a1
+ghcr.io/dgcampea/gpuowl  v7.2-70-g212618e
+ghcr.io/dgcampea/gpuowl  latest
+
+# pull v7.2-70-g212618e
+$ podman pull ghcr.io/dgcampea/gpuowl:v7.2-70-g212618e
+```
 
 ### Note: SELinux enabled systems
 
-For SELinux enabled systems, `udica` package is recommended.  
-If the package is not available for your distribution, you can download
-the required file from:
+For SELinux enabled systems, two modules are required:
+
+  - base\_container.cil (provided by `udica`)
+  - gpuowl.cil (located at `extras/gpuowl.cil`)
+
+If `udica` package is not available for your distribution, you can
+download the required file from:
 <https://github.com/containers/udica/blob/master/udica/templates/base_container.cil>
 
 #### With `udica`:
 
-    sudo semodule -i gpuowl_container.cil /usr/share/udica/templates/base_container.cil
+``` sh
+$ sudo semodule -i extras/gpuowl_container.cil /usr/share/udica/templates/base_container.cil
+```
 
 #### Without `udica`
 
-    curl -O https://raw.githubusercontent.com/containers/udica/master/udica/templates/base_container.cil 
-    sudo semodule -i gpuowl_container.cil base_container.cil
+``` sh
+$ curl -O https://raw.githubusercontent.com/containers/udica/master/udica/templates/base_container.cil
+$ sudo semodule -i extras/gpuowl_container.cil base_container.cil
+```
 
 ## Usage
 
@@ -53,18 +79,18 @@ Required podman/docker parameters:
 
 Example:
 
-    mkdir $HOME/gpuowl_container
-    
-    # with SELinux
-    podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
-        --security-opt label=type:gpuowl_container.process \
-        -v "$HOME/gpuowl_container":/in:Z gpuowl:latest -h
-    
-    # without SELinux
-    podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
-        -v "$HOME/gpuowl_container":/in gpuowl:latest -h
+``` sh
+mkdir $HOME/gpuowl_container
 
-See *gpuowl-wrapper.sh* and *Dockerfile* for more details.
+# with SELinux
+$ podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
+    --security-opt label=type:gpuowl_container.process \
+    -v "$HOME/gpuowl_container":/in:Z gpuowl:latest -h
+
+# without SELinux
+$ podman run --rm -it --name gpuowl --device=/dev/kfd --device=/dev/dri \
+    -v "$HOME/gpuowl_container":/in gpuowl:latest -h
+```
 
 ### Drop-in replacement mode (console usage)
 
@@ -79,11 +105,13 @@ Note: The wrapper will attempt to mount the current working directory
 Prepare your system with (replace *\<user\>* with the user that will run
 `gpuowl`):
 
-    sudo setsebool -P container_manage_cgroup on      # for SELinux systems
-    sudo loginctl enable-linger <user>
-    mkdir "$HOME/gpuowl_container"
-    cp extras/gpuowl.service ~/.config/systemd/user/gpuowl.service
-    systemctl enable --user gpuowl@default.service
+``` sh
+$ sudo setsebool -P container_manage_cgroup on      # for SELinux systems
+$ sudo loginctl enable-linger <user>
+$ mkdir "$HOME/gpuowl_container"
+$ cp extras/daemon/gpuowl.service ~/.config/systemd/user/gpuowl.service
+$ systemctl enable --user gpuowl@default.service
+```
 
 In this mode, `gpuowl` will read and save its data to
 `~/gpuowl_container/instance-default`.  
@@ -100,20 +128,25 @@ Grant your user sudo powers for `rocm-smi` by adding this to your
 
 Afterwards, create an override config for the service unit with:
 
-    install -Dm644 -t ~/.config/systemd/user/gpuowl@.service.d extras/override.conf
-    systemctl daemon-reload --user
+``` sh
+$ install -Dm644 -t ~/.config/systemd/user/gpuowl@.service.d extras/daemon/override.conf
+$ systemctl daemon-reload --user
+```
 
 ## Building locally
 
-Invoke `make` to build Dockerfile.  
+### Dependencies
+
+  - buildah
+
+Invoke `make` to build container image.  
 Variables can be overridden with `make VAR=value VAR2=value ...`.  
-By default, the built image is tagged as *gpuowl:COMMIT\_ID*,
-*gpuowl:gpuowl\_version* and *gpuowl:latest*.  
-If `COMMIT` is specified, the image will not be tagged with *latest*.
+By default, the built image is tagged as *gpuowl:\<gpuowl\_version\>*
+and *gpuowl:latest*.
 
 ### Makefile recipes
 
-#### image / image-nocache
+#### image
 
 *default target*
 
@@ -125,15 +158,25 @@ Install gpuowl-wrapper.sh to `~/.local/bin`.
 
 ### Makefile variables
 
-#### COMMIT
+#### CHECKOUT
 
-*default = ? latest commit id at HEAD, generated when make is executed
-?*
+*default = ? HEAD ?*
 
-Set the image tag and checkout at the commit specified.  
-If the latest commit id at HEAD isn’t retrievable, defaults to `HEAD`.  
-Can be used to checkout specific commit ids or branches.  
+Checkout at the commit/branch specified.  
 Upstream repo: <https://github.com/preda/gpuowl>
+
+#### ROCM\_VER
+
+*default = ? latest ?*
+
+Set ROCm version for base image.  
+If set, image name will be set to gpuowl-\<ROCM\_VER\>.
+
+#### LATEST
+
+*default = ? 1 ?*
+
+Tag the built image with :latest.
 
 ## License
 
